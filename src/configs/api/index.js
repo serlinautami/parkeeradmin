@@ -11,4 +11,6 @@ API.tambahJenisParkir = apiRequest.post(apiEndpoint.jenisParkir, true);
 API.updateJenisParkir = apiRequest.put(apiEndpoint.jenisParkir, true);
 API.deleteJenisParkir = apiRequest.delete(apiEndpoint.jenisParkir, true);
 
+API.customer = apiRequest.get(apiEndpoint.customer, true);
+
 export default API;
