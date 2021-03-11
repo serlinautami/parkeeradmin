@@ -28,12 +28,21 @@ class DefaultLayout extends Component {
 
   loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>
 
+  
+
   signOut(e) {
     e.preventDefault()
+    localStorage.clear();
     this.props.history.push('/login')
   }
 
   render() {
+
+    const userData = localStorage.getItem('userData');
+    const authData = localStorage.getItem('authData');
+
+    const isAuthenticated = userData && authData;
+
     return (
       <div className="app">
         <AppHeader fixed>
@@ -56,7 +65,7 @@ class DefaultLayout extends Component {
             <Container fluid>
               <Suspense fallback={this.loading()}>
                 <Switch>
-                  {routes.map((route, idx) => {
+                  {isAuthenticated && routes.map((route, idx) => {
                     return route.component ? (
                       <Route
                         key={idx}
@@ -68,16 +77,16 @@ class DefaultLayout extends Component {
                         )} />
                     ) : (null);
                   })}
-                  <Redirect from="/" to="/dashboard" />
+                  <Redirect from="/" to={isAuthenticated ? '/dashboard' : '/login'} />
                 </Switch>
               </Suspense>
             </Container>
           </main>
-          <AppAside fixed>
+          {/* <AppAside fixed>
             <Suspense fallback={this.loading()}>
               <DefaultAside />
             </Suspense>
-          </AppAside>
+          </AppAside> */}
         </div>
         <AppFooter>
           <Suspense fallback={this.loading()}>

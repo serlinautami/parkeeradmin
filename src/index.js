@@ -5,6 +5,7 @@ import './polyfill'
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
+import '../node_modules/react-toastify/dist/ReactToastify.min.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 
