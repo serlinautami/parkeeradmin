@@ -163,18 +163,15 @@ export const addMemberAdmin = async (form) => {
   }
 }
 
-export const updateMemberAdmin = async (id, form) => {
+export const resetPasswordMemberAdmin = async (id) => {
   try {
     const payload = {
-      path: id,
-      body: {
-        ...form
-      }
+      path: `${id}/reset-password`,
     }
-    const response = await API.updateMemberAdmin(payload);
+    const response = await API.resetPasswordMemberAdmin(payload);
     return response;
   } catch (err) {
-    console.log('updateMemberAdmin error:', err);
+    console.log('resetPasswordMemberAdmin error:', err);
     throw err;
   }
 }

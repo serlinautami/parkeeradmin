@@ -26,7 +26,7 @@ API.customer = apiRequest.get(apiEndpoint.customer, true);
 // Member Admin
 API.memberAdmin = apiRequest.get(apiEndpoint.memberAdmin, true);
 API.createMemberAdmin = apiRequest.post(apiEndpoint.memberAdmin, true);
-API.updateMemberAdmin = apiRequest.put(apiEndpoint.memberAdmin, true);
+API.resetPasswordMemberAdmin = apiRequest.put(apiEndpoint.memberAdmin, true);
 API.deleteMemberAdmin = apiRequest.delete(apiEndpoint.memberAdmin, true);
 
 export default API;

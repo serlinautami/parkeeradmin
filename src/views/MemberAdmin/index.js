@@ -4,7 +4,7 @@ import { API } from '../../configs';
 import { useForm } from '../../utils';
 import { toast } from 'react-toastify';
 import moment from 'moment';
-import { getMemberAdmin, addMemberAdmin, updateMemberAdmin, deleteMemberAdmin } from '../../services';
+import { getMemberAdmin, addMemberAdmin, resetPasswordMemberAdmin, deleteMemberAdmin } from '../../services';
 
 const MemberAdmin = () => {
 
@@ -14,6 +14,9 @@ const MemberAdmin = () => {
     name: '',
     email: ''
   })
+
+  const userData = JSON.parse(localStorage.getItem('userData'))
+  const isSuperadmin = userData?.role === 'super-admin';
 
   const getInitialData = async () => {
     try {
@@ -56,6 +59,32 @@ const MemberAdmin = () => {
     }
   }
 
+  const handlePressResetPassword = async (id) => {
+    try {
+      const conf = window.confirm('Reset password Member Admin ini?');
+
+      if(!conf) return;
+
+      const res = await resetPasswordMemberAdmin(id);
+      return toast.success(res.message);
+    } catch (err) {
+      toast.error(err?.message);
+    }
+  }
+  const handlePressDelete = async (id) => {
+    try {
+      const conf = window.confirm('Hapus member admin ini?');
+
+      if(!conf) return;
+
+      const res = await deleteMemberAdmin(id);
+      getInitialData();
+      return toast.success(res.message);
+    } catch (err) {
+      toast.error(err?.message);
+    }
+  }
+
   useEffect(() => {
     getInitialData();
   }, [])
@@ -64,7 +93,7 @@ const MemberAdmin = () => {
       <div className="animated fadeIn">
         <Card>
           <CardHeader>
-            <strong>Daftar Kustomer Parkir</strong>
+            <strong>Daftar Member Admin</strong>
           </CardHeader>
           <CardBody>
             <FormGroup>
@@ -76,6 +105,9 @@ const MemberAdmin = () => {
                   <th>Nama</th>
                   <th>Email</th>
                   <th>Bergabung pada</th>
+                  {isSuperadmin && (
+                    <th>Aksi</th>
+                  )}
                 </tr>
               </thead>
               <tbody>
@@ -85,6 +117,12 @@ const MemberAdmin = () => {
                       <td>{item.name}</td>
                       <td>{item.email}</td>
                       <td>{moment(item.createdAt).format('DD MMMM YYYY')}</td>
+                      {isSuperadmin && (
+                        <td className="text-right">
+                          <Button onClick={() => handlePressResetPassword(item.id)} className="ml-2" color="primary" size="sm">Reset Password</Button>
+                          <Button onClick={() => handlePressDelete(item.id)} className="ml-2" color="danger" size="sm">Hapus</Button>
+                        </td>
+                      )}
                     </tr>
                   )
                 })}
