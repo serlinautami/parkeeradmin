@@ -73,7 +73,8 @@ class ApiRequest {
 
       if(userData) {
         userData = JSON.parse(userData);
-        baseHeaders['Authorization'] = `Bearer ${userData.accessToken}`;
+        console.log('userData', userData);
+        baseHeaders['Authorization'] = `Bearer ${userData.access_token}`;
       }
     }
 

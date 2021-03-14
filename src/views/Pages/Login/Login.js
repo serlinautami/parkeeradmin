@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Button, Card, CardBody, CardGroup, Col, Container, Form, Input, InputGroup, InputGroupAddon, InputGroupText, Row, Alert } from 'reactstrap';
 import { API } from '../../../configs';
 import { toast } from 'react-toastify';
+import { login, getProfile } from '../../../services';
 
 const Login = ({ history, location }) => {
   console.log('history', history, location)
@@ -18,27 +19,6 @@ const Login = ({ history, location }) => {
 
   const handleToggleAlert = () => setAlert(prev => ({...prev, visible: !prev.visible }))
 
-
-  const handleGetProfile = async () => {
-
-    try {
-      const response = await API.profile();
-      if(!response || !response.data) {
-        throw response;
-      }
-
-      const { data } = response;
-      const userData = JSON.stringify(data);
-
-      localStorage.setItem('userData', userData);
-
-      return userData;
-      
-    } catch(err) {
-      throw err;
-    }
-  }
-
   const handleSumbit = async (e) => {
     if(e) e.preventDefault();
 
@@ -51,20 +31,8 @@ const Login = ({ history, location }) => {
     }
 
     try {
-      const response = await API.login({ body: { email, password }})
-
-      if(!response || !response.data) {
-        return setAlert({
-          visible: true,
-          message: 'Terjadi Kesalahan',
-          color: 'danger'
-        })
-      }
-
-      const { data } = response;
-      const authData = JSON.stringify(data);
-      localStorage.setItem('authData', authData);
-      await handleGetProfile();
+      await login(email, password);
+      await getProfile();
       toast.success('Login Berhasil')
       setAlert({
         visible: true,
@@ -83,42 +51,6 @@ const Login = ({ history, location }) => {
         color: 'danger'
       })
     }
-
-    API.login({
-      body: {
-        email,
-        password
-      }
-    }).then(response => {
-      if(!response || !response.data) {
-        return setAlert({
-          visible: true,
-          message: 'Terjadi Kesalahan',
-          color: 'danger'
-        })
-      }
-
-      setAlert({
-        visible: true,
-        message: 'Login Berhasil',
-        color: 'success',
-      })
-
-      const { data } = response;
-      const authData = JSON.stringify(data);
-      localStorage.setItem('authData', authData);
-      setTimeout(() => {
-        history.replace('/dashboard')
-      }, 1000)
-
-    }).catch(error => {
-      console.log('login error:', error)
-      setAlert({
-        visible: true,
-        message: error?.message || 'Terjadi kesalahan',
-        color: 'danger'
-      })
-    })
   }
 
 

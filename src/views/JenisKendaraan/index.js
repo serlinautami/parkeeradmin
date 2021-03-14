@@ -4,37 +4,27 @@ import { API } from '../../configs';
 import { useForm } from '../../utils';
 import NumberFormat from 'react-number-format';
 import { toast } from 'react-toastify';
-import Select from 'react-select';
-import { getParkingTypes, addParkingType, updateParkingType, deleteParkingType, getVehicleTypes } from '../../services';
+import { getVehicleTypes, addVehicleType, updateVehicleType, deleteVehicleType } from '../../services';
 
-import makeAnimated from 'react-select/animated';
-const animatedComponents = makeAnimated();
-
-const JenisParkir = () => {
+const JenisKendaraan = () => {
 
   const [isLoading, setLoading] = useState(false);
-  const [vehicleTypes, setVehicleType] = useState([]);
-  const [parkingTypes, setParkingType] = useState([]);
+  const [vehicleTypes, setVehicleData] = useState([]);
   const [showModal, setModal] = useState(false);
   const [form, setForm] = useForm({
-    name: '',
-    fee: '',
-    list: []
+    name: ''
   });
 
 
   const getInitialData = async () => {
     try {
-      setLoading(true);
-      const parkingTypeList = await getParkingTypes();
-      const vehicleTypeList = await getVehicleTypes();
-
-      setLoading(false);
-      setParkingType(parkingTypeList);
-      setVehicleType(vehicleTypeList);
-      return parkingTypeList;
+      setLoading(true)
+      const data = await getVehicleTypes();
+      setLoading(false)
+      setVehicleData(data);
+      return data;
     } catch (err) {
-      setLoading(true);
+      setLoading(true)
       console.log('getInitialData err', err);
     }
   }
@@ -49,20 +39,9 @@ const JenisParkir = () => {
   }
 
   const handlePressEdit = (item) => {
-    let list = [];
-    const parkingVehicleList = item.parking_vehicle_lists;
-
-    if(parkingVehicleList) {
-      list = parkingVehicleList.map(val => ({
-        id: val?.vehicle_type?.id,
-        name: val?.vehicle_type?.name
-      }))
-    }
     setForm({
       id: item.id,
       name: item.name,
-      fee: item.fee,
-      list
     }, 'multiple')
 
     handleOpenModal();
@@ -76,51 +55,34 @@ const JenisParkir = () => {
       const conf = window.confirm(`Ingin menghapus ${item.name} dari daftar`);
       if(conf) {
         try {
-          const res = await deleteParkingType(id);
+          const res = await deleteVehicleType(id)
 
           toast.success(res.message || 'Sukses')
 
           return getInitialData();
 
         } catch (err) {
-          toast.error(err?.message || 'Terjadi Kesalahan')
+          toast.error(err?.message)
         }
       }
     }
 
   }
 
-  const handleSelectChange = value => {
-    setForm(value, 'list');
-  }
-
-  const renderBiaya = value => {
-    return <NumberFormat value={value} displayType="text" thousandSeparator="." decimalSeparator="," prefix={'Rp. '} /> 
-  }
-
   const handleSubmitForm = async event => {
+
     if(event) event.preventDefault();
-    
-
     try {
-
-
-
       const payload = {
-        name: form.name,
-        fee: form.fee
+        name: form.name
       }
 
-      if(form?.list?.length > 0) {
-        payload.vehicle_list = form.list.map(item => item.id);
-      }
-
-      const response = form.id ? await updateParkingType(form.id, payload) : await addParkingType(payload);
-      toast.success(response.message || 'Sukses');
+      const response = form.id ? await updateVehicleType(form.id, payload) : await addVehicleType(payload);
+      toast.success(response.message);
       handleCloseModal();
       return getInitialData();
     } catch (err) {
-      toast.error(err?.message || 'Terjadi Kesalahan')
+      toast.error(err?.message)
     }
   }
     
@@ -134,26 +96,24 @@ const JenisParkir = () => {
       <div className="animated fadeIn">
         <Card>
           <CardHeader>
-            <strong>Daftar Jenis Parkir</strong>
+            <strong>Daftar Jenis Kendaraan</strong>
           </CardHeader>
           <CardBody>
             <FormGroup>
-              <Button onClick={handleOpenModal} color="primary">Tambah Jenis Parkir</Button>
+              <Button onClick={handleOpenModal} color="primary">Tambah Jenis Kendaraan</Button>
             </FormGroup>
             <Table bordered hover responsive>
               <thead className="bg-primary">
                 <tr>
                   <th>Nama</th>
-                  <th>Biaya</th>
                   <th>Aksi</th>
                 </tr>
               </thead>
               <tbody>
-                {parkingTypes.map((item, index) => {
+                {vehicleTypes.map((item, index) => {
                   return (
                     <tr key={item.id}>
                       <td>{item.name}</td>
-                      <td>{renderBiaya(item.fee)}</td>
                       <td className="text-right">
                         <Button onClick={() => handlePressEdit(item)} className="ml-2" color="primary" size="sm">Edit</Button>
                         <Button onClick={() => handlePressDelete(item)} className="ml-2" color="danger" size="sm">Hapus</Button>
@@ -168,29 +128,12 @@ const JenisParkir = () => {
         <Modal isOpen={showModal}>
           <Form onSubmit={handleSubmitForm}>
             <ModalHeader toggle={handleCloseModal}>
-              Form Jenis Parkir
+              Formulir
             </ModalHeader>
             <ModalBody>
               <FormGroup>
-                <Label>Nama Parkir</Label>
-                <Input value={form.name} type="text" placeholder="ex: Parkir motor" onChange={e => setForm(e.target.value, 'name')} />
-              </FormGroup>
-              <FormGroup>
-                <Label>Biaya</Label>
-                <Input min={0} value={form.fee} type="number" placeholder="0" onChange={e => setForm(e.target.value, 'fee')} />
-              </FormGroup>
-              <FormGroup>
-                <Label>Jenis Kendaraan</Label>
-                <Select
-                  closeMenuOnSelect={false}
-                  components={animatedComponents}
-                  getOptionLabel={option => option.name}
-                  getOptionValue={option => option.id}
-                  onChange={handleSelectChange}
-                  value={form.list}
-                  isMulti
-                  options={vehicleTypes}
-                />
+                <Label>Nama</Label>
+                <Input value={form.name} type="text" placeholder="ex: Motor" onChange={e => setForm(e.target.value, 'name')} />
               </FormGroup>
             </ModalBody>
             <ModalFooter>
@@ -204,4 +147,4 @@ const JenisParkir = () => {
 }
 
 
-export default JenisParkir;
+export default JenisKendaraan;

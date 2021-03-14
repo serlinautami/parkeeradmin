@@ -33,6 +33,10 @@ export default {
           name: 'Jenis Parkir',
           url: '/pengaturan/jenis-parkir',
         },
+        {
+          name: 'Jenis Kendaraan',
+          url: '/pengaturan/jenis-kendaraan',
+        },
       ]
     }
   ],
