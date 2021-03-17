@@ -23,7 +23,7 @@ const MemberAdmin = () => {
       const data = await getMemberAdmin();
       setAdmin(data);
     } catch(err) {
-      toast.error('server errror')
+      toast.error(err?.message)
     }
   }
 

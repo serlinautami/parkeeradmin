@@ -147,6 +147,7 @@ export const getMemberAdmin = async () => {
     return data;
   } catch (err) {
     console.log('getMemberAdmin error:', err);
+    throw err;
   }
 }
 
